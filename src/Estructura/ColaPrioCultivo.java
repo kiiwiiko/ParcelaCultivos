@@ -43,18 +43,6 @@ public class ColaPrioCultivo {
         return null;
     }
 
-    public List<Cultivo> buscarPorTipo(String tipo) {
-        List<Cultivo> resultados = new ArrayList<>();
-
-        for (Cultivo c : colaPrio) {
-            if (c.getTipoCultivo().equalsIgnoreCase(tipo)) {
-                resultados.add(c);
-            }
-        }
-
-        return resultados;
-    }
-
 
     public boolean eliminar(int idCultivo) {
         Cultivo encontrado = buscar(idCultivo);
@@ -62,18 +50,55 @@ public class ColaPrioCultivo {
         return colaPrio.remove(encontrado);
     }
 
-    public boolean modificar(int iDCultivo, String nuevoTipoCultivo, Integer nuevaCantidadSiembra, LocalDate nuevaFecha, ESTADO nuevoEstado) {
+    public boolean modificar(int iDCultivo, int nuevaCantidadSiembra, int x, int y) {
         Cultivo c = buscar(iDCultivo);
         if (c == null) return false;
 
         colaPrio.remove(c);
 
-        if (nuevoTipoCultivo != null) c.setTipoCultivo(nuevoTipoCultivo);
-        if (nuevaCantidadSiembra != null) c.setCantidadSiembra(nuevaCantidadSiembra);
-        if (nuevaFecha != null) c.setFechaCultivo(nuevaFecha);
-        if (nuevoEstado != null) c.setEstado(nuevoEstado);
+        c.setCantidadSiembra(nuevaCantidadSiembra);
+        c.setAreaSiembraX(x);
+        c.setAreaSiembraY(y);
 
         colaPrio.offer(c);
         return true;
     }
+
+    private boolean esTransicionValida(ESTADO actual, ESTADO nuevo) {
+        if (actual == ESTADO.PLANIFICACION) {
+            return nuevo == ESTADO.SIEMBRA;   // desde planificacion SOLO se puede sembrar
+        }
+        if (actual == ESTADO.SIEMBRA) {
+            return nuevo == ESTADO.COSECHA;  // desde siembra SOLO se puede cosechar
+        }
+        if (actual == ESTADO.COSECHA) {
+            return false;                    // desde cosecha ya no se mueve (según lo que pides)
+        }
+        return false;
+    }
+
+
+    public boolean cambiarEstado(int idCultivo, ESTADO nuevoEstado) {
+        Cultivo c = buscar(idCultivo);
+        if (c == null) return false;
+
+        ESTADO actual = c.getEstado();
+
+        if (!esTransicionValida(actual, nuevoEstado)) {
+            return false;
+        }
+
+        colaPrio.remove(c);
+
+        c.setEstado(nuevoEstado);
+
+        // Guardar fecha SOLO cuando entra a SIEMBRA (y si no estaba ya)
+        if (nuevoEstado == ESTADO.SIEMBRA && c.getFechaSiembra() == null) {
+            c.setFechaSiembra(LocalDate.now());
+        }
+
+        colaPrio.offer(c);
+        return true;
+    }
+
 }

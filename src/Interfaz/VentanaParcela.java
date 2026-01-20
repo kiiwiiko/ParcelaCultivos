@@ -1,10 +1,11 @@
 package Interfaz;
 
 
+import Estructura.ColaPrioCultivo;
+import Estructura.ESTADO;
 import Estructura.ListaParcela;
 import Negocio.Cultivo;
 import Negocio.Parcela;
-import com.sun.jdi.Value;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -57,11 +58,34 @@ public class VentanaParcela {
     private JLabel label6;
     private JLabel label9;
     private JLabel idParcelaCultivo;
+    private JPanel buscarCultivoPanel;
+    private JPanel planificarPanel;
+    private JPanel diagnosticoPanel;
+    private JPanel tratamientoPanel;
+    private JButton modificarButton1;
+    private JTextField buscarCultivoField;
+    private JButton buscarCultivoButton;
+    private JLabel labelBuscarCultivoId;
+    private JTextArea cultivoEncontradoArea;
+    private JButton eliminarCultivoButton;
+    private JButton planificacionCultivoButton;
+    private JTextArea planificarArea;
+    private JButton verEstadoButton;
+    private JButton sembrarButton;
+    private JButton cosecharButton;
+    private JLabel parcelaIdPlanificarLabel;
+    private JLabel parcelaIdPlanificar;
+    private JLabel cultivoIdPlanificarLabel;
+    private JLabel cultivoIdPlanificar;
 
 
     //Lista Parcela
     private ListaParcela parcela = new ListaParcela();
     private Parcela parcelaEncontrada = null;
+
+    // Lista Cultivo
+    private ColaPrioCultivo cultivo = new ColaPrioCultivo();
+    private Cultivo cultivoSeleccionado = null;
 
     private int idUlt, idNext = 1;
 
@@ -90,22 +114,37 @@ public class VentanaParcela {
         frame.setVisible(true);
 
         parcelaPane.setEnabledAt(2, false);
+        parcelaPane.setEnabledAt(3, false);
+        parcelaPane.setEnabledAt(4, false);
+        parcelaPane.setEnabledAt(5, false);
+        parcelaPane.setEnabledAt(6, false);
 
 
 
-        //Opcion Salir
+        //Opción Salir
         regresarInicio.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 parcelaPane.setEnabledAt(2, false);
+                parcelaPane.setEnabledAt(3, false);
+                parcelaPane.setEnabledAt(4, false);
+                parcelaPane.setEnabledAt(5, false);
+                parcelaPane.setEnabledAt(6, false);
+
+
                 parcelaPane.setEnabledAt(0, true);
                 parcelaPane.setEnabledAt(1, true);
-                abrirPanelCultivo(1);
+                parcelaPane.setSelectedIndex(0);
                 mostrarLista();
             }
         });
 
-        //Parcela
+
+
+
+        //Botones de Parcela
+
+        // Agregar Parcelas
         agregarParcelaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -130,6 +169,7 @@ public class VentanaParcela {
             }
         });
 
+        // Buscar Parcelas
         buscarParcelaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -162,8 +202,7 @@ public class VentanaParcela {
             }
         });
 
-
-        //Parcela
+        //Eliminar Parcelas
         eliminarParcelaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -176,22 +215,7 @@ public class VentanaParcela {
             }
         });
 
-        ingresarCultivoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (parcelaEncontrada == null) {
-                    JOptionPane.showMessageDialog(null, "Primero busca o selecciona una parcela");
-                    return;
-                }
-                refrescarListaCultivos();
-                idParcelaCultivo.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
-                parcelaPane.setEnabledAt(2, true);
-                parcelaPane.setEnabledAt(0, false);
-                parcelaPane.setEnabledAt(1, false);
-                abrirPanelCultivo(2);
-            }
-        });
-
+        // Setear Datos de Lista
         listaParcelas.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -214,6 +238,7 @@ public class VentanaParcela {
             }
         });
 
+        // Modificar la Lista
         modificarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -241,6 +266,31 @@ public class VentanaParcela {
 
             }
         });
+
+        // Dirige a Cutivos
+        ingresarCultivoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (parcelaEncontrada == null) {
+                    JOptionPane.showMessageDialog(null, "Primero busca o selecciona una parcela");
+                    return;
+                }
+                refrescarListaCultivos();
+                idParcelaCultivo.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
+                parcelaPane.setEnabledAt(2, true);
+                parcelaPane.setEnabledAt(3, true);
+
+                parcelaPane.setEnabledAt(0, false);
+                parcelaPane.setEnabledAt(1, false);
+                parcelaPane.setSelectedIndex(2);
+            }
+        });
+
+
+
+        // Botones de Cultivo
+
+        // Ingresar Cultivos
         ingresarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -285,9 +335,301 @@ public class VentanaParcela {
             }
         });
 
+        // Lista de Cultivos
+        listaCultivo.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                // Evita que se dispare dos veces mientras “arrastras”
+                if (e.getValueIsAdjusting()) return;
+
+                int idx = listaCultivo.getSelectedIndex();
+                if (idx == -1 || parcelaEncontrada == null) return;
+
+                List<Cultivo> cultivos = parcelaEncontrada.getCultivos().listarOrdenado();
+                if (idx >= cultivos.size()) return;
+
+                cultivoSeleccionado = cultivos.get(idx);
+
+                modificarButton1.setEnabled(true);
+                ingresarButton.setEnabled(false);
+                comboBox1.setEnabled(false);
+
+                // Setear datos en el panel de cultivo
+                idCultivoLabel.setText(String.valueOf(cultivoSeleccionado.getIDcultivo())); // ajusta getter
+                idParcelaCultivo.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
+                comboBox1.setSelectedItem(cultivoSeleccionado.getTipoCultivo());
+                spinner1.setValue(cultivoSeleccionado.getCantidadSiembra());
+                spinner2.setValue(cultivoSeleccionado.getAreaSiembraX());
+                spinner3.setValue(cultivoSeleccionado.getAreaSiembraY());
+            }
+        });
+
+        // Modificar Cultivo
+        modificarButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (parcelaEncontrada == null) {
+                        JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                        return;
+                    }
+
+                    int idCultivo = Integer.parseInt(idCultivoLabel.getText());
+                    String nuevoTipo = comboBox1.getSelectedItem().toString();
+                    int nuevaCantidad = Integer.parseInt(spinner1.getValue().toString());
+                    int x = Integer.parseInt(spinner2.getValue().toString());
+                    int y = Integer.parseInt(spinner3.getValue().toString());
+
+
+                    boolean modificado = parcelaEncontrada.getCultivos().modificar(idCultivo, nuevaCantidad, x, y);
+
+                    if (modificado) {
+                        JOptionPane.showMessageDialog(null, "Cultivo modificado correctamente");
+                        refrescarListaCultivos();
+                        borrarDatosCultivo();
+                        modificarButton1.setEnabled(false);
+                        ingresarButton.setEnabled(true);
+                        comboBox1.setEnabled(true);
+
+                        refrescarListaCultivos();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se pudo modificar el cultivo");
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Error al modificar cultivo", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // Buscar Cultivo
+        buscarCultivoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    eliminarCultivoButton.setEnabled(true);
+                    planificacionCultivoButton.setEnabled(true);
+
+
+                    if (parcelaEncontrada == null) {
+                        JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                        return;
+                    }
+
+                    String texto = buscarCultivoField.getText().trim();
+                    if (texto.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Ingrese un ID de cultivo");
+                        return;
+                    }
+
+                    int idCultivo = Integer.parseInt(texto);
+                    Cultivo c = parcelaEncontrada.getCultivos().buscar(idCultivo);
+
+                    if (c != null) {
+                        idCultivoLabel.setText(String.valueOf(c.getIDcultivo()));
+                        cultivoEncontradoArea.setText(c.toString());
+
+                        cultivoSeleccionado = c;
+                    } else {
+                        idCultivoLabel.setText("");
+                        cultivoEncontradoArea.setText("No se encontró cultivo con ese ID");
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "ID inválido", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // Eliminar Cultivo
+        eliminarCultivoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (parcelaEncontrada == null) {
+                        JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                        return;
+                    }
+
+                    String texto = idCultivoLabel.getText().trim();
+                    if (texto.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Primero busca o selecciona un cultivo");
+                        return;
+                    }
+
+                    int idCultivo = Integer.parseInt(texto);
+                    boolean eliminado = parcelaEncontrada.getCultivos().eliminar(idCultivo);
+
+                    if (eliminado) {
+                        cultivoEncontradoArea.setText("Cultivo eliminado correctamente");
+                        idCultivoLabel.setText("");
+                        refrescarListaCultivos();
+                        borrarDatosCultivo();
+                    } else {
+                        cultivoEncontradoArea.setText("No se pudo eliminar el cultivo");
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Error al eliminar cultivo", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // Direccion a Planificar
+        planificacionCultivoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (parcelaEncontrada == null) {
+                    JOptionPane.showMessageDialog(null, "Primero busca o selecciona una parcela");
+                    return;
+                }
+                refrescarListaCultivos();
+                idParcelaCultivo.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
+                parcelaPane.setEnabledAt(6, true);
+                parcelaPane.setEnabledAt(5, true);
+                parcelaPane.setEnabledAt(4, true);
+
+                parcelaPane.setEnabledAt(3, false);
+                parcelaPane.setEnabledAt(2, false);
+                parcelaPane.setSelectedIndex(4);
+
+                cultivoIdPlanificar.setText(String.valueOf(cultivoSeleccionado.getIDcultivo()));
+                parcelaIdPlanificar.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
+            }
+
+        });
+
+
+        verEstadoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int idCultivo = Integer.parseInt(cultivoIdPlanificar.getText());
+                Cultivo c = parcelaEncontrada.getCultivos().buscar(idCultivo);
+
+                if (c == null) {
+                    JOptionPane.showMessageDialog(null, "Cultivo no encontrado");
+                    return;
+                }
+
+                ESTADO estado = c.getEstado();
+                String mensaje;
+
+                if (estado == ESTADO.PLANIFICACION) {
+                    sembrarButton.setEnabled(true);
+                    cosecharButton.setEnabled(false);
+                    mensaje = "Estado: " + estado;
+
+                } else if (estado == ESTADO.SIEMBRA) {
+                    sembrarButton.setEnabled(false);
+                    cosecharButton.setEnabled(true);
+
+                    String fechaSiembra = (c.getFechaSiembra() != null)
+                            ? c.getFechaSiembra().toString()
+                            : "No registrada";
+
+                    mensaje = "Estado: " + estado +
+                            "\nFecha de siembra: " + fechaSiembra;
+
+                } else if (estado == ESTADO.COSECHA) {
+                    sembrarButton.setEnabled(false);
+                    cosecharButton.setEnabled(false);
+
+                    String fechaSiembra = (c.getFechaSiembra() != null)
+                            ? c.getFechaSiembra().toString()
+                            : "No registrada";
+
+                    String fechaCosecha = (c.getFechaCultivo() != null)
+                            ? c.getFechaCultivo().toString()
+                            : "No registrada";
+
+                    mensaje = "Estado: " + estado +
+                            "\nFecha de siembra: " + fechaSiembra +
+                            "\nFecha de cosecha: " + fechaCosecha;
+
+                } else {
+
+                    mensaje = "Estado: " + estado;
+                }
+                planificarArea.setText("ESTADO\n" + mensaje);
+            }
+
+        });
+
+        sembrarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (parcelaEncontrada == null) {
+                    JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                    return;
+                }
+
+                String txtId = cultivoIdPlanificar.getText().trim();
+                if (txtId.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No hay cultivo seleccionado");
+                    return;
+                }
+
+                int idCultivo;
+                try {
+                    idCultivo = Integer.parseInt(txtId);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "ID de cultivo inválido");
+                    return;
+                }
+
+                boolean ok = parcelaEncontrada.getCultivos().cambiarEstado(idCultivo, ESTADO.SIEMBRA);
+
+                if (!ok) {
+                    JOptionPane.showMessageDialog(null, "No se puede SEMBRAR en el estado actual");
+                    return;
+                }
+
+                // Mostrar el estado actualizado reutilizando tu botón Ver Estado
+                verEstadoButton.doClick();
+            }
+        });
+
+
+        cosecharButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (parcelaEncontrada == null) {
+                    JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                    return;
+                }
+
+                String txtId = cultivoIdPlanificar.getText().trim();
+                if (txtId.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No hay cultivo seleccionado");
+                    return;
+                }
+
+                int idCultivo;
+                try {
+                    idCultivo = Integer.parseInt(txtId);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "ID de cultivo inválido");
+                    return;
+                }
+
+                boolean ok = parcelaEncontrada.getCultivos().cambiarEstado(idCultivo, ESTADO.COSECHA);
+
+                if (!ok) {
+                    JOptionPane.showMessageDialog(null, "No se puede COSECHAR en el estado actual");
+                    return;
+                }
+
+                // Mostrar el estado actualizado reutilizando tu botón Ver Estado
+                verEstadoButton.doClick();
+            }
+        });
 
     }
 
+    // Funciones de Parcela
     public void borrarDatos() {
         nombreParcelaField.setText("");
         ubicacionParcelaCombo.setSelectedIndex(0);
@@ -311,8 +653,13 @@ public class VentanaParcela {
         idParcelaLabel.setText(String.valueOf(idUlt));
     }
 
-    private void abrirPanelCultivo(int i) {
-        parcelaPane.setSelectedIndex(i);
+
+    // Funciones de Cultivo
+    private void borrarDatosCultivo() {
+        comboBox1.setSelectedIndex(0);
+        spinner1.setValue(0);
+        spinner2.setValue(0);
+        spinner3.setValue(0);
     }
 
     private void refrescarListaCultivos() {
@@ -328,10 +675,5 @@ public class VentanaParcela {
         listaCultivo.setModel(dlm);
     }
 
-    private void borrarDatosCultivo() {
-        comboBox1.setSelectedIndex(0);
-        spinner1.setValue(0);
-        spinner2.setValue(0);
-        spinner3.setValue(0);
-    }
+
 }

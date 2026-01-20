@@ -22,6 +22,23 @@ public class Cultivo implements Comparable<Cultivo> {
         this.areaSiembra[1] = y;
         this.areaCultivo = x * y;
         this.estado = estado;
+
+        if (estado == ESTADO.SIEMBRA) {
+            this.fechaSiembra = LocalDate.now();
+        }
+    }
+
+
+    public void setAreaSiembra(double[] areaSiembra) {
+        this.areaSiembra = areaSiembra;
+    }
+
+    public void setAreaCultivo(double areaCultivo) {
+        this.areaCultivo = areaCultivo;
+    }
+
+    public void setIDcultivo(int IDcultivo) {
+        this.IDcultivo = IDcultivo;
     }
 
     public ESTADO getEstado() {
@@ -56,8 +73,12 @@ public class Cultivo implements Comparable<Cultivo> {
         this.cantidadSiembra = cantidadSiembra;
     }
 
-    public double[] getAreaSiembra() {
-        return areaSiembra;
+    public double getAreaSiembraX() {
+        return areaSiembra[0];
+    }
+
+    public double getAreaSiembraY() {
+        return areaSiembra[1];
     }
 
     public void setAreaSiembraX(double x) {
@@ -68,6 +89,18 @@ public class Cultivo implements Comparable<Cultivo> {
     public void setAreaSiembraY(double y) {
         this.areaSiembra[1] = y;
         this.areaCultivo = this.areaSiembra[0] * this.areaSiembra[1];
+    }
+
+    public void aplicarEstado(ESTADO nuevoEstado) {
+        this.estado = nuevoEstado;
+
+        if (nuevoEstado == ESTADO.SIEMBRA && this.fechaSiembra == null) {
+            this.fechaSiembra = LocalDate.now();
+        }
+
+        if (nuevoEstado == ESTADO.COSECHA && this.fechaCultivo == null) {
+            this.fechaCultivo = LocalDate.now();
+        }
     }
 
     public LocalDate getFechaSiembra() {
@@ -90,6 +123,7 @@ public class Cultivo implements Comparable<Cultivo> {
     public String toString() {
         return "ID " + IDcultivo + " | " +
                 "Tipo: " + tipoCultivo + " | " +
+                "Cant: " + cantidadSiembra + " | " +
                 "Dim: " + areaSiembra[0] + " x " + areaSiembra[1] + " | " +
                 "Área: " + areaCultivo + " m² | " +
                 "Estado: " + estado;
