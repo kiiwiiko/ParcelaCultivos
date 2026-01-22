@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+
 public class VentanaParcela {
     private JPanel Ventana;
     private JTabbedPane parcelaPane;
@@ -77,6 +78,19 @@ public class VentanaParcela {
     private JLabel parcelaIdPlanificar;
     private JLabel cultivoIdPlanificarLabel;
     private JLabel cultivoIdPlanificar;
+    private JLabel nombreParcelaCultivo;
+    private JLabel labelNombreParcelaCultivo;
+    private JLabel nombrePlanificar;
+    private JLabel nombrePlanificarLabel;
+    private JButton ultimosDiagnosticosButton;
+    private JButton nuevoDiagnosticoButton;
+    private JLabel parcelaDiagnostico;
+    private JLabel cultivoDiagnostico;
+    private JLabel propietarioDiagnostico;
+    private JLabel parcelaDiagnosticoLabel;
+    private JLabel cultivoDiagnositcoLabel;
+    private JLabel propietarioDiagnosticoLabel;
+    private JTextArea diagnosticoArea;
 
 
     //Lista Parcela
@@ -87,7 +101,6 @@ public class VentanaParcela {
     private ColaPrioCultivo cultivo = new ColaPrioCultivo();
     private Cultivo cultivoSeleccionado = null;
 
-    private int idUlt, idNext = 1;
 
 
     public VentanaParcela(){
@@ -125,13 +138,14 @@ public class VentanaParcela {
         regresarInicio.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Bloquear las ventanas para el usuario
                 parcelaPane.setEnabledAt(2, false);
                 parcelaPane.setEnabledAt(3, false);
                 parcelaPane.setEnabledAt(4, false);
                 parcelaPane.setEnabledAt(5, false);
                 parcelaPane.setEnabledAt(6, false);
 
-
+                //Solo habilitar las siguientes
                 parcelaPane.setEnabledAt(0, true);
                 parcelaPane.setEnabledAt(1, true);
                 parcelaPane.setSelectedIndex(0);
@@ -149,22 +163,40 @@ public class VentanaParcela {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (e.getSource() == agregarParcelaButton) {
-                        String nombre = nombreParcelaField.getText();
-                        String ubicacion = ubicacionParcelaCombo.getSelectedItem().toString();
-                        double x = Double.parseDouble(xParcelaSpin.getValue().toString());
-                        double y = Double.parseDouble(yParcelaSpin.getValue().toString());
-                        if(nombre.equalsIgnoreCase("") || ubicacion.equalsIgnoreCase("") || x <= 0 || y <= 0) {
-                            JOptionPane.showMessageDialog(null, "Por favor ingresar todos los parametros");
-                        } else {
-                            parcela.adicionarParcela(nombre, ubicacion, x, y);
-                            mostrarLista();
-                            borrarDatos();
-                            genId();
-                        }
-                    }
-                } catch(Exception r) {
+                    String nombre = nombreParcelaField.getText();
+                    String ubicacion = ubicacionParcelaCombo.getSelectedItem().toString();
+                    double x = Double.parseDouble(xParcelaSpin.getValue().toString());
+                    double y = Double.parseDouble(yParcelaSpin.getValue().toString());
 
+
+                    if (nombre.equalsIgnoreCase("") || ubicacion.equalsIgnoreCase("") || x <= 0 || y <= 0) {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Ingrese todos los datos correctamente"
+                        );
+                        return;
+                    }
+
+                    Parcela p = parcela.adicionarParcela(nombre, ubicacion, x, y);
+                    if(p != null) {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Parcela " +
+                                        Parcela.getNumeroDeParcela() +
+                                        " registrada correctamente"
+                        );
+                    }
+                    mostrarLista();
+                    borrarDatos();
+                    idParcelaLabel.setText(String.valueOf(Parcela.getNumeroDeParcela() + 1));
+
+                } catch(Exception r) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Error al ingresar la parcela",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -174,30 +206,36 @@ public class VentanaParcela {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (e.getSource() == buscarParcelaButton) {
+                    int id = Integer.parseInt(buscarParcelaField.getText());
 
-                        int id = Integer.parseInt(buscarParcelaField.getText());
+                    if (buscarParcelaField.getText().equalsIgnoreCase("")) {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Debe ingresar un Id para buscar"
+                        );
+                    } else {
+                        parcelaEncontrada = parcela.buscarParcela(id);
 
-                        if (buscarParcelaField.getText().equalsIgnoreCase("")) {
-                            JOptionPane.showMessageDialog(null, "Debe ingresar un Id para buscar");
+                        if (parcelaEncontrada != null) {
+                            buscarParcelaArea.setText(parcelaEncontrada.toString());
+                            eliminarParcelaButton.setEnabled(true);
+                            ingresarCultivoButton.setEnabled(true);
+                            buscarParcelaField.setText("");
                         } else {
-                            parcelaEncontrada = parcela.buscarParcela(id);
-
-                            if (parcelaEncontrada != null) {
-                                buscarParcelaArea.setText(parcelaEncontrada.toString());
-                                eliminarParcelaButton.setEnabled(true);
-                                ingresarCultivoButton.setEnabled(true);
-                                buscarParcelaField.setText("");
-                            } else {
-                                buscarParcelaArea.setText("La parcela " + id + " no exite en la lista");
-                                eliminarParcelaButton.setEnabled(false);
-                                ingresarCultivoButton.setEnabled(false);
-                                borrarDatos();
-                            }
+                            buscarParcelaArea.setText("La parcela " + id + " no exite en la lista");
+                            eliminarParcelaButton.setEnabled(false);
+                            ingresarCultivoButton.setEnabled(false);
+                            borrarDatos();
                         }
                     }
+
                 } catch (Exception t) {
-                    JOptionPane.showMessageDialog(null, "Ingrese el id correctamente", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Ingrese el id correctamente",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -243,25 +281,35 @@ public class VentanaParcela {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (e.getSource() == modificarButton) {
-                        String nombre = nombreParcelaField.getText();
-                        double x = Double.parseDouble(xParcelaSpin.getValue().toString());
-                        double y = Double.parseDouble(yParcelaSpin.getValue().toString());
-                        if (nombre.equalsIgnoreCase("") || x <= 0 || y <= 0) {
-                            JOptionPane.showMessageDialog(null, "Por favor ingresar todos los parametros");
-                        } else {
-                            parcela.modificarParcela(parcelaEncontrada, nombre, x, y);
-                            mostrarLista();
-                            borrarDatos();
-                            idParcelaLabel.setText(String.valueOf(idUlt));
 
-                            agregarParcelaButton.setEnabled(true);
-                            ubicacionParcelaCombo.setEnabled(true);
-                            agregarParcelaButton.setEnabled(true);
-                            modificarButton.setEnabled(false);
-                        }
+                    String nombre = nombreParcelaField.getText();
+                    double x = Double.parseDouble(xParcelaSpin.getValue().toString());
+                    double y = Double.parseDouble(yParcelaSpin.getValue().toString());
+
+                    if (nombre.equalsIgnoreCase("") || x <= 0 || y <= 0) {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Por favor ingresar todos los parametros"
+                        );
+                    } else {
+                        parcela.modificarParcela(parcelaEncontrada, nombre, x, y);
+                        mostrarLista();
+                        borrarDatos();
+
+                        idParcelaLabel.setText(String.valueOf(Parcela.getNumeroDeParcela() + 1));
+                        agregarParcelaButton.setEnabled(true);
+                        ubicacionParcelaCombo.setEnabled(true);
+                        agregarParcelaButton.setEnabled(true);
+                        modificarButton.setEnabled(false);
                     }
+
                 } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "No se ha modificado correctamente",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
 
             }
@@ -272,11 +320,20 @@ public class VentanaParcela {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (parcelaEncontrada == null) {
-                    JOptionPane.showMessageDialog(null, "Primero busca o selecciona una parcela");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Primero busca o selecciona una parcela"
+                    );
                     return;
                 }
                 refrescarListaCultivos();
                 idParcelaCultivo.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
+                labelNombreParcelaCultivo.setText(String.valueOf(parcelaEncontrada.getNombreParcela()));
+                parcelaIdPlanificar.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
+                nombrePlanificarLabel.setText(String.valueOf(parcelaEncontrada.getNombreParcela()));
+                parcelaDiagnosticoLabel.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
+                propietarioDiagnosticoLabel.setText(String.valueOf(parcelaEncontrada.getNombreParcela()));
+
                 parcelaPane.setEnabledAt(2, true);
                 parcelaPane.setEnabledAt(3, true);
 
@@ -296,7 +353,10 @@ public class VentanaParcela {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (parcelaEncontrada == null) {
-                        JOptionPane.showMessageDialog(null, "No hay parcela seleccionada para registrar cultivos");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "No hay parcela seleccionada para registrar cultivos"
+                        );
                         return;
                     }
 
@@ -304,10 +364,12 @@ public class VentanaParcela {
                     int cantidad = Integer.parseInt(spinner1.getValue().toString());
                     double x = Double.parseDouble(spinner2.getValue().toString());
                     double y = Double.parseDouble(spinner3.getValue().toString());
-                    idLabelCultivo.setText(String.valueOf(idNext));
 
                     if (tipo.equalsIgnoreCase("") || cantidad <= 0 || x <= 0 || y <= 0) {
-                        JOptionPane.showMessageDialog(null, "Ingrese todos los datos correctamente");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Ingrese todos los datos correctamente"
+                        );
                         return;
                     }
 
@@ -322,15 +384,24 @@ public class VentanaParcela {
                     }
 
                     parcelaEncontrada.getCultivos().encolar(tipo, cantidad, x, y);
-                    idNext++;
 
                     refrescarListaCultivos();
                     borrarDatosCultivo();
+                    idLabelCultivo.setText(String.valueOf(Cultivo.getNumeroCultivo() + 1));
                     buscarParcelaArea.setText(parcelaEncontrada.toString());
-                    JOptionPane.showMessageDialog(null, "Cultivo registrado en la parcela " + parcelaEncontrada.getIdParcela());
-
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Cultivo registrado en la parcela " +
+                                    parcelaEncontrada.getIdParcela()
+                    );
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Error al ingresar cultivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Error al ingresar cultivo: " +
+                                    ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -370,7 +441,10 @@ public class VentanaParcela {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (parcelaEncontrada == null) {
-                        JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "No hay parcela seleccionada"
+                        );
                         return;
                     }
 
@@ -384,7 +458,10 @@ public class VentanaParcela {
                     boolean modificado = parcelaEncontrada.getCultivos().modificar(idCultivo, nuevaCantidad, x, y);
 
                     if (modificado) {
-                        JOptionPane.showMessageDialog(null, "Cultivo modificado correctamente");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Cultivo modificado correctamente"
+                        );
                         refrescarListaCultivos();
                         borrarDatosCultivo();
                         modificarButton1.setEnabled(false);
@@ -393,11 +470,19 @@ public class VentanaParcela {
 
                         refrescarListaCultivos();
                     } else {
-                        JOptionPane.showMessageDialog(null, "No se pudo modificar el cultivo");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "No se pudo modificar el cultivo"
+                        );
                     }
 
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Error al modificar cultivo", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Error al modificar cultivo",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -412,13 +497,19 @@ public class VentanaParcela {
 
 
                     if (parcelaEncontrada == null) {
-                        JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "No hay parcela seleccionada"
+                        );
                         return;
                     }
 
                     String texto = buscarCultivoField.getText().trim();
                     if (texto.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Ingrese un ID de cultivo");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Ingrese un ID de cultivo"
+                        );
                         return;
                     }
 
@@ -436,7 +527,12 @@ public class VentanaParcela {
                     }
 
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "ID inválido", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "ID inválido",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -447,13 +543,19 @@ public class VentanaParcela {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (parcelaEncontrada == null) {
-                        JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "No hay parcela seleccionada"
+                        );
                         return;
                     }
 
                     String texto = idCultivoLabel.getText().trim();
                     if (texto.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Primero busca o selecciona un cultivo");
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Primero busca o selecciona un cultivo"
+                        );
                         return;
                     }
 
@@ -470,7 +572,12 @@ public class VentanaParcela {
                     }
 
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Error al eliminar cultivo", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Error al eliminar cultivo",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -484,7 +591,8 @@ public class VentanaParcela {
                     return;
                 }
                 refrescarListaCultivos();
-                idParcelaCultivo.setText(String.valueOf(parcelaEncontrada.getIdParcela()));
+                cultivoIdPlanificar.setText(String.valueOf(cultivoSeleccionado.getIDcultivo()));
+                cultivoDiagnositcoLabel.setText(String.valueOf(cultivoSeleccionado.getIDcultivo()));
                 parcelaPane.setEnabledAt(6, true);
                 parcelaPane.setEnabledAt(5, true);
                 parcelaPane.setEnabledAt(4, true);
@@ -508,7 +616,9 @@ public class VentanaParcela {
                 Cultivo c = parcelaEncontrada.getCultivos().buscar(idCultivo);
 
                 if (c == null) {
-                    JOptionPane.showMessageDialog(null, "Cultivo no encontrado");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Cultivo no encontrado");
                     return;
                 }
 
@@ -561,13 +671,19 @@ public class VentanaParcela {
             public void actionPerformed(ActionEvent e) {
 
                 if (parcelaEncontrada == null) {
-                    JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "No hay parcela seleccionada"
+                    );
                     return;
                 }
 
                 String txtId = cultivoIdPlanificar.getText().trim();
                 if (txtId.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No hay cultivo seleccionado");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "No hay cultivo seleccionado"
+                    );
                     return;
                 }
 
@@ -575,7 +691,10 @@ public class VentanaParcela {
                 try {
                     idCultivo = Integer.parseInt(txtId);
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "ID de cultivo inválido");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "ID de cultivo inválido"
+                    );
                     return;
                 }
 
@@ -597,13 +716,19 @@ public class VentanaParcela {
             public void actionPerformed(ActionEvent e) {
 
                 if (parcelaEncontrada == null) {
-                    JOptionPane.showMessageDialog(null, "No hay parcela seleccionada");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "No hay parcela seleccionada"
+                    );
                     return;
                 }
 
                 String txtId = cultivoIdPlanificar.getText().trim();
                 if (txtId.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No hay cultivo seleccionado");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "No hay cultivo seleccionado"
+                    );
                     return;
                 }
 
@@ -611,14 +736,20 @@ public class VentanaParcela {
                 try {
                     idCultivo = Integer.parseInt(txtId);
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "ID de cultivo inválido");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "ID de cultivo inválido"
+                    );
                     return;
                 }
 
                 boolean ok = parcelaEncontrada.getCultivos().cambiarEstado(idCultivo, ESTADO.COSECHA);
 
                 if (!ok) {
-                    JOptionPane.showMessageDialog(null, "No se puede COSECHAR en el estado actual");
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "No se puede COSECHAR en el estado actual"
+                    );
                     return;
                 }
 
@@ -627,6 +758,20 @@ public class VentanaParcela {
             }
         });
 
+        nuevoDiagnosticoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cultivoSeleccionado.getDiagnosticos().adicionarDiagnostico(cultivoSeleccionado.getTipoCultivo(), cultivoSeleccionado.getEstado());
+                diagnosticoArea.setText(String.valueOf(cultivoSeleccionado.getDiagnosticos().mostrarDiagnosticos()));
+            }
+        });
+
+        ultimosDiagnosticosButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                diagnosticoArea.setText(cultivoSeleccionado.getDiagnosticos().imprimirUltimoDiagnostico());
+            }
+        });
     }
 
     // Funciones de Parcela
@@ -645,12 +790,6 @@ public class VentanaParcela {
             dlm.addElement(p.toString());
         }
         listaParcelas.setModel(dlm);
-    }
-
-    public void genId() {
-        Parcela p = parcela.getParcelas().get(idUlt);
-        idUlt = p.getIdParcela() + 1;
-        idParcelaLabel.setText(String.valueOf(idUlt));
     }
 
 

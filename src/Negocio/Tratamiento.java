@@ -1,7 +1,5 @@
 package Negocio;
 
-import Estructura.ListaDiagnostico;
-
 import java.time.LocalDate;
 
 public class Tratamiento implements Comparable<Tratamiento>{

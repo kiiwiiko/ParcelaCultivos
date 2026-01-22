@@ -2,6 +2,7 @@ package Estructura;
 
 import Negocio.Parcela;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,18 @@ public class ListaParcela {
     }
 
     public Parcela adicionarParcela(String nombreParcela, String ubicacionParcela, double x, double y) {
+        for(Parcela p : parcelas) {
+            if(nombreParcela.equalsIgnoreCase(p.getNombreParcela())) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "El nombre " +
+                                nombreParcela +
+                                " ya ha sido registrado\n" +
+                                "Por favor cambiar por otro"
+                );
+                return null;
+            }
+        }
         Parcela p = new Parcela(nombreParcela, ubicacionParcela, x, y);
         parcelas.add(p);
         Collections.sort(parcelas);

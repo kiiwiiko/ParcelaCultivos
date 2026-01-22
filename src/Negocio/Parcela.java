@@ -23,6 +23,34 @@ public class Parcela implements Comparable<Parcela> {
         this.cultivos = new ColaPrioCultivo();
     }
 
+    public static int getNumeroDeParcela() {
+        return numeroDeParcela;
+    }
+
+    public static void setNumeroDeParcela(int numeroDeParcela) {
+        Parcela.numeroDeParcela = numeroDeParcela;
+    }
+
+    public void setIdParcela(int idParcela) {
+        this.idParcela = idParcela;
+    }
+
+    public double[] getDimensionesParcela() {
+        return dimensionesParcela;
+    }
+
+    public void setDimensionesParcela(double[] dimensionesParcela) {
+        this.dimensionesParcela = dimensionesParcela;
+    }
+
+    public void setAreaTotal(double areaTotal) {
+        this.areaTotal = areaTotal;
+    }
+
+    public void setCultivos(ColaPrioCultivo cultivos) {
+        this.cultivos = cultivos;
+    }
+
     public ColaPrioCultivo getCultivos() {
         return cultivos;
     }

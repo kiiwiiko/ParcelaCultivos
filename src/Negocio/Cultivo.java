@@ -1,6 +1,9 @@
 package Negocio;
 
+import Estructura.ArbolDesicion;
 import Estructura.ESTADO;
+import Estructura.PilaDiagnostico;
+
 import java.time.LocalDate;
 
 public class Cultivo implements Comparable<Cultivo> {
@@ -13,6 +16,7 @@ public class Cultivo implements Comparable<Cultivo> {
     private LocalDate fechaCultivo;
     private ESTADO estado;
     private double areaCultivo;
+    private PilaDiagnostico diagnosticos;
 
     public Cultivo(String tipoCultivo, int cantidadSiembra, double x, double y, ESTADO estado) {
         this.IDcultivo = ++numeroCultivo;
@@ -26,8 +30,30 @@ public class Cultivo implements Comparable<Cultivo> {
         if (estado == ESTADO.SIEMBRA) {
             this.fechaSiembra = LocalDate.now();
         }
+
+        this.diagnosticos = new PilaDiagnostico();
     }
 
+
+    public static int getNumeroCultivo() {
+        return numeroCultivo;
+    }
+
+    public PilaDiagnostico getDiagnosticos() {
+        return diagnosticos;
+    }
+
+    public void setDiagnosticos(PilaDiagnostico diagnosticos) {
+        this.diagnosticos = diagnosticos;
+    }
+
+    public static void setNumeroCultivo(int numeroCultivo) {
+        Cultivo.numeroCultivo = numeroCultivo;
+    }
+
+    public double[] getAreaSiembra() {
+        return areaSiembra;
+    }
 
     public void setAreaSiembra(double[] areaSiembra) {
         this.areaSiembra = areaSiembra;
