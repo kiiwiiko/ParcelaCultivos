@@ -655,14 +655,19 @@
                   <text value="Reporte Tratamiento"/>
                 </properties>
               </component>
-              <component id="b07f2" class="javax.swing.JTextArea" binding="tratamientoArea">
+              <scrollpane id="9b0ea">
                 <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="50"/>
-                  </grid>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
-              </component>
+                <border type="none"/>
+                <children>
+                  <component id="b07f2" class="javax.swing.JTextArea" binding="tratamientoArea">
+                    <constraints/>
+                    <properties/>
+                  </component>
+                </children>
+              </scrollpane>
             </children>
           </grid>
         </children>

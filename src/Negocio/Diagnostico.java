@@ -16,12 +16,10 @@ public class Diagnostico extends ArbolDesicion {
 
     @Override
     public String toString() {
-        return "--------------------------------------------------\n" +
-                "                  Diagnostico " +
-                idDiagnostico +
-                "\n" +
-                "--------------------------------------------------\n" +
-                preguntas +
-                "\n";
+        return "--------------------------------------------------------------------------------\n" +
+                "                  DIAGNOSTICO " +
+                idDiagnostico + "\n" +
+                "--------------------------------------------------------------------------------\n" +
+                preguntas + "\n";
     }
 }

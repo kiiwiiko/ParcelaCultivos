@@ -779,7 +779,19 @@ public class VentanaParcela {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                tratamientoArea.setText(cultivoSeleccionado.getTratamiento().toString());
+                tratamientoArea.setText("TRATAMIENTO CULTIVO " + cultivoSeleccionado.getIDcultivo()  + "\n" +
+                        "--------------------------------------------------------------------------------\n\n" +
+                        "PARCELA ID: " + parcelaEncontrada.getIdParcela() + "\n" +
+                        "PROPIETARIO: " + parcelaEncontrada.getNombreParcela() + "\n" +
+                        "AREA DISPONIBLE: " + parcelaEncontrada.getAreaDisponible() + "\n" +
+                        "AREA DEL CULTIVO: " + cultivoSeleccionado.getAreaCultivo() + "\n" +
+                        "UNIDADES PLANTADAS: " + cultivoSeleccionado.getCantidadSiembra() + "\n" +
+                        cultivoSeleccionado.getDiagnosticos().mostrarDiagnosticos() + "\n" +
+                        "--------------------------------------------------------------------------------\n" +
+                        "EL TRATAMIENTO A REALIZAR\n" +
+                        "--------------------------------------------------------------------------------\n" +
+                        cultivoSeleccionado.getTratamiento().toString()
+                );
             }
         });
     }
