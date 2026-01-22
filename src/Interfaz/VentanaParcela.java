@@ -100,7 +100,6 @@ public class VentanaParcela {
     private Parcela parcelaEncontrada = null;
 
     // Lista Cultivo
-    private ColaPrioCultivo cultivo = new ColaPrioCultivo();
     private Cultivo cultivoSeleccionado = null;
 
 

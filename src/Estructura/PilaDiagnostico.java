@@ -60,9 +60,9 @@ public class PilaDiagnostico {
 
     public String imprimirUltimoDiagnostico() {
         if (!diagnosticos.isEmpty()) {
-            return "--------------------------------------------------\n" +
-                    "               Ultimo Diagnostico\n" +
-                    "--------------------------------------------------\n" +
+            return "================================================================================\n" +
+                    "                          Ultimo Diagnostico\n" +
+                    "================================================================================\n" +
                     diagnosticos.peek().toString();
         }
         return null;
