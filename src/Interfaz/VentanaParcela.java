@@ -599,7 +599,7 @@ public class VentanaParcela {
                 parcelaPane.setEnabledAt(5, true);
                 parcelaPane.setEnabledAt(4, true);
 
-                parcelaPane.setEnabledAt(3, false);
+                parcelaPane.setEnabledAt(3, true);
                 parcelaPane.setEnabledAt(2, false);
                 parcelaPane.setSelectedIndex(4);
 
@@ -780,16 +780,16 @@ public class VentanaParcela {
             public void actionPerformed(ActionEvent e) {
 
                 tratamientoArea.setText("TRATAMIENTO CULTIVO " + cultivoSeleccionado.getIDcultivo()  + "\n" +
-                        "--------------------------------------------------------------------------------\n\n" +
+                        "================================================================================\n\n" +
                         "PARCELA ID: " + parcelaEncontrada.getIdParcela() + "\n" +
                         "PROPIETARIO: " + parcelaEncontrada.getNombreParcela() + "\n" +
                         "AREA DISPONIBLE: " + parcelaEncontrada.getAreaDisponible() + "\n" +
                         "AREA DEL CULTIVO: " + cultivoSeleccionado.getAreaCultivo() + "\n" +
                         "UNIDADES PLANTADAS: " + cultivoSeleccionado.getCantidadSiembra() + "\n" +
                         cultivoSeleccionado.getDiagnosticos().mostrarDiagnosticos() + "\n" +
-                        "--------------------------------------------------------------------------------\n" +
+                        "================================================================================\n" +
                         "EL TRATAMIENTO A REALIZAR\n" +
-                        "--------------------------------------------------------------------------------\n" +
+                        "================================================================================\n" +
                         cultivoSeleccionado.getTratamiento().toString()
                 );
             }
