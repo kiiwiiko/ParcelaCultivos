@@ -91,6 +91,8 @@ public class VentanaParcela {
     private JLabel cultivoDiagnositcoLabel;
     private JLabel propietarioDiagnosticoLabel;
     private JTextArea diagnosticoArea;
+    private JButton reporteTratamientoButton;
+    private JTextArea tratamientoArea;
 
 
     //Lista Parcela
@@ -763,6 +765,7 @@ public class VentanaParcela {
             public void actionPerformed(ActionEvent e) {
                 cultivoSeleccionado.getDiagnosticos().adicionarDiagnostico(cultivoSeleccionado.getTipoCultivo(), cultivoSeleccionado.getEstado());
                 diagnosticoArea.setText(String.valueOf(cultivoSeleccionado.getDiagnosticos().mostrarDiagnosticos()));
+                cultivoSeleccionado.setTratamiento();
             }
         });
 
@@ -770,6 +773,13 @@ public class VentanaParcela {
             @Override
             public void actionPerformed(ActionEvent e) {
                 diagnosticoArea.setText(cultivoSeleccionado.getDiagnosticos().imprimirUltimoDiagnostico());
+            }
+        });
+        reporteTratamientoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                tratamientoArea.setText(cultivoSeleccionado.getTratamiento().toString());
             }
         });
     }

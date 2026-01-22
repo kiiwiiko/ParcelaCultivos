@@ -17,6 +17,7 @@ public class Cultivo implements Comparable<Cultivo> {
     private ESTADO estado;
     private double areaCultivo;
     private PilaDiagnostico diagnosticos;
+    private Tratamiento tratamiento;
 
     public Cultivo(String tipoCultivo, int cantidadSiembra, double x, double y, ESTADO estado) {
         this.IDcultivo = ++numeroCultivo;
@@ -32,8 +33,16 @@ public class Cultivo implements Comparable<Cultivo> {
         }
 
         this.diagnosticos = new PilaDiagnostico();
+        this.tratamiento = null;
     }
 
+    public String getTratamiento() {
+        return tratamiento.mostrarTratamiento();
+    }
+
+    public void setTratamiento() {
+        this.tratamiento = new Tratamiento();
+    }
 
     public static int getNumeroCultivo() {
         return numeroCultivo;
